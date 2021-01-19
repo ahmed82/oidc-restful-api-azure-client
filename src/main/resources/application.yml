@@ -1,0 +1,9 @@
+server:
+  port: '8080'
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://sts.windows.net/383a21fa-5bd0-4c86-9d38-b3f502c87e15/
+
