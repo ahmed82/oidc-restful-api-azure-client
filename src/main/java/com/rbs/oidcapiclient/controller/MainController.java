@@ -1,17 +1,21 @@
 package com.rbs.oidcapiclient.controller;
 
 import java.security.Principal;
+import java.util.Collection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.rbs.oidcapiclient.constant.AuthoritiesConstants;
 
 
 @RestController
@@ -20,16 +24,13 @@ public class MainController {
 	@GetMapping("/user")
 	@PreAuthorize("hasRole(T(com.rbs.botmanager.utile.SecurityConstants).APPROVER) "
 			+ "|| hasRole(T(com.rbs.botmanager.utile.SecurityConstants).EDITOR)")
-	public String getUsername(Authentication authentication, Principal principal) {
-		System.out.println("--------authentication---------");
-		System.out.println(authentication.getName());
-
-		System.out.println("--------principal---------");
-		System.out.println(principal.getName());
+	public String getUsername() {
+		Authentication authentication2 = SecurityContextHolder.getContext().getAuthentication();
+		Collection<GrantedAuthority> authorities = (Collection<GrantedAuthority>) authentication2.getAuthorities();
 
 		Object user = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		System.out.println("--------user---------" + user.toString());
-		return "Success...";
+		logger.info("--------user---------" + authorities.toString());
+		return "Success..."+authorities.toString();
 	}
 
 	@PreAuthorize("hasRole('AAG-DA-QA-ChatBot-Approver')")
@@ -50,11 +51,12 @@ public class MainController {
 	}
 
 	// @PreAuthorize("hasRole('AAG-DA-QA-ChatBot-Approver')")
-	@PreAuthorize("hasRole(T(com.rbs.botmanager.utile.SecurityConstants).APPROVER) "
-			+ "|| hasRole(T(com.rbs.botmanager.utile.SecurityConstants).EDITOR)")
+	@PreAuthorize("hasRole('" + AuthoritiesConstants.USER + "')" +
+            " && hasRole('" + AuthoritiesConstants.ADMIN + "')" )
 	@RequestMapping(value = "/test3", method = RequestMethod.GET)
 	@ResponseBody
 	public String currentUserName(Authentication authentication, Principal principal) {
+		
 		logger.info("########111##############" + authentication.getName() + "#########222#############"
 				+ authentication.getDetails() + "#########33#############" + authentication.getPrincipal()
 				+ "##########444############" + authentication.getCredentials() + "#########555#############"
